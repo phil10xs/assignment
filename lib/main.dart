@@ -38,12 +38,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController countryCtlr = TextEditingController(text: '');
+  List<String> filteredCtries = [];
+  var _countries = [];
+
   _navigateToAddAddressScreen() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const AddressScreen(title: "Address screen"),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    filteredCtries = countries;
+    _countries = countries;
   }
 
   @override
@@ -81,11 +92,21 @@ class _HomePageState extends State<HomePage> {
                     height: 20,
                   ),
                   TextFormField(
+                    controller: countryCtlr,
                     keyboardType: TextInputType.text,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     inputFormatters: [],
                     validator: (v) => v!.fieldvalidation(field: "Country"),
-                    onChanged: (value) => {},
+                    onChanged: (value) => {
+                      setState(() {
+                        filteredCtries = countries
+                            .where((element) => element
+                                .toString()
+                                .toLowerCase()
+                                .contains(countryCtlr.text.toLowerCase()))
+                            .toList();
+                      }),
+                    },
                     decoration: InputDecoration(
                       labelText: "Country",
                       labelStyle: Theme.of(context).textTheme.bodySmall,
@@ -102,6 +123,36 @@ class _HomePageState extends State<HomePage> {
                       hintStyle: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
+                  countryCtlr.text.isNotEmpty
+                      ? Container(
+                          height: 130,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                for (var i = 0;
+                                    i < filteredCtries.length;
+                                    i++) ...[
+                                  filteredCtries.isEmpty
+                                      ? SizedBox()
+                                      : ListTile(
+                                          visualDensity:
+                                              const VisualDensity(vertical: -3),
+                                          onTap: () {
+                                            countryCtlr.text =
+                                                filteredCtries[i];
+                                            setState(() {});
+                                          },
+                                          title: Text(
+                                            filteredCtries[i],
+                                          ),
+                                        ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
+
                   // ElevatedButton(
                   //   style: TextButton.styleFrom(
                   //     foregroundColor: Colors.white,
