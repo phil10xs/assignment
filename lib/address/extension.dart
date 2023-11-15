@@ -1,9 +1,15 @@
 extension GetInitials on String {
-  String? fieldvalidation({String? field}) {
-    if (toString().length < 1) {
+  String? fieldvalidation({String? field, String? value}) {
+    if (value!.length < 1) {
       return '$field field is required';
     } else {
-      return null;
+      ///street
+      if (field!.toLowerCase().contains('street')) {
+        List<String> parts = value.toLowerCase().split('-');
+        if (parts.length != 3) {
+          return 'Invalid format. Please use "subarea-block-house"';
+        }
+      }
     }
   }
 }
