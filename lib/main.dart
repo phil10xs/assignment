@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterassignment/address/address_screen.dart';
 import 'package:flutterassignment/address/extension.dart';
+import 'package:flutterassignment/gbheader.dart';
+import 'package:flutterassignment/gbtextfield.dart';
+import 'package:flutterassignment/user.dart';
 
 void main() {
   runApp(const MyApp());
@@ -74,6 +77,17 @@ class _HomePageState extends State<HomePage> {
           onTap: () {
             if (_formKey.currentState!.validate()) {
               _formKey.currentState!.save();
+
+              //saved user object here
+              var userModel = UserModel(
+                country: countryCtlr.text,
+                prefecture: prefectCtlr.text,
+                municipality: muniCtlr.text,
+                streetAddress: streetCtlr.text,
+                apartment: apartCtlr.text,
+              );
+
+              print(userModel.toJson());
             }
           },
           child: Container(
@@ -207,154 +221,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class Header extends StatefulWidget {
-  final String? title;
-  final Function? onNavBack;
-  final bool? enableNav;
-  final String? icon;
-  final bool? hideBackButton;
-
-  const Header({
-    super.key,
-    this.title = '',
-    this.onNavBack,
-    this.enableNav,
-    this.icon,
-    this.hideBackButton = false,
-  });
-
-  @override
-  State<Header> createState() => _HeaderState();
-}
-
-class _HeaderState extends State<Header> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 55,
-      color: const Color(0xff521c78),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (!widget.hideBackButton!)
-                Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: InkWell(
-                    onTap: () => widget.enableNav!
-                        ? Navigator.of(context).pop()
-                        : widget.onNavBack!(),
-                    child: Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
-                ),
-              const Spacer(),
-              Text(widget.title!,
-                  style: TextStyle(color: Colors.white, fontSize: 20)),
-              SizedBox(
-                width: 16,
-              ),
-              const Spacer(),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class GigaBankTextField extends StatefulWidget {
-  final TextEditingController ctlr;
-  final Function(String) onChanged;
-  final String title;
-  final bool? hasSearcableValue;
-  final bool? hasSuffix;
-  final List<String>? searchedValue;
-  final Function(String)? onSelected;
-
-  const GigaBankTextField({
-    super.key,
-    required this.ctlr,
-    required this.onChanged,
-    required this.title,
-    this.hasSearcableValue = false,
-    this.searchedValue,
-    this.onSelected,
-    this.hasSuffix = false,
-  });
-
-  @override
-  State<GigaBankTextField> createState() => _GigaBankTextFieldState();
-}
-
-class _GigaBankTextFieldState extends State<GigaBankTextField> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextFormField(
-          controller: widget.ctlr,
-          keyboardType: TextInputType.text,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          inputFormatters: [],
-          validator: (v) =>
-              v!.fieldvalidation(field: widget.title, value: widget.ctlr.text),
-          onChanged: (value) => {
-            widget.onChanged(value),
-          },
-          decoration: InputDecoration(
-            labelText: widget.title,
-            labelStyle: Theme.of(context).textTheme.bodySmall,
-            contentPadding: const EdgeInsets.only(
-              top: 14.0,
-              bottom: 12.0,
-              left: 5.0,
-              right: 14.0,
-            ),
-
-            // fillColor: Colors.white70,
-            suffixIcon: widget.hasSuffix! ? const Icon(Icons.search) : null,
-            hintText: widget.title,
-            hintStyle: Theme.of(context).textTheme.bodySmall,
-          ),
-        ),
-        widget.ctlr.text.isNotEmpty & widget.hasSearcableValue!
-            ? Container(
-                height: 130,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      for (var i = 0;
-                          i < widget.searchedValue!.length;
-                          i++) ...[
-                        widget.searchedValue!.isEmpty
-                            ? SizedBox()
-                            : ListTile(
-                                visualDensity:
-                                    const VisualDensity(vertical: -3),
-                                onTap: () {
-                                  widget.onSelected!(widget.searchedValue![i]);
-                                },
-                                title: Text(
-                                  widget.searchedValue![i],
-                                ),
-                              ),
-                      ],
-                    ],
-                  ),
-                ),
-              )
-            : SizedBox(),
-      ],
     );
   }
 }
