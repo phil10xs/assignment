@@ -91,13 +91,18 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(
                     height: 20,
                   ),
-                  TextFormField(
-                    controller: countryCtlr,
-                    keyboardType: TextInputType.text,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    inputFormatters: [],
-                    validator: (v) => v!.fieldvalidation(field: "Country"),
-                    onChanged: (value) => {
+
+                  GigaBankTextField(
+                    onSelected: (v) {
+                      countryCtlr.text = v;
+                      filteredCtries = [];
+                      setState(() {});
+                    },
+                    title: 'Country',
+                    ctlr: countryCtlr,
+                    searchedValue: filteredCtries,
+                    hasSearcableValue: true,
+                    onChanged: (v) {
                       setState(() {
                         filteredCtries = countries
                             .where((element) => element
@@ -105,53 +110,9 @@ class _HomePageState extends State<HomePage> {
                                 .toLowerCase()
                                 .contains(countryCtlr.text.toLowerCase()))
                             .toList();
-                      }),
+                      });
                     },
-                    decoration: InputDecoration(
-                      labelText: "Country",
-                      labelStyle: Theme.of(context).textTheme.bodySmall,
-                      contentPadding: const EdgeInsets.only(
-                        top: 14.0,
-                        bottom: 12.0,
-                        left: 5.0,
-                        right: 14.0,
-                      ),
-                      filled: true,
-                      // fillColor: Colors.white70,
-                      suffixIcon: Icon(Icons.search),
-                      hintText: "Country",
-                      hintStyle: Theme.of(context).textTheme.bodySmall,
-                    ),
                   ),
-                  countryCtlr.text.isNotEmpty
-                      ? Container(
-                          height: 130,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                for (var i = 0;
-                                    i < filteredCtries.length;
-                                    i++) ...[
-                                  filteredCtries.isEmpty
-                                      ? SizedBox()
-                                      : ListTile(
-                                          visualDensity:
-                                              const VisualDensity(vertical: -3),
-                                          onTap: () {
-                                            countryCtlr.text =
-                                                filteredCtries[i];
-                                            setState(() {});
-                                          },
-                                          title: Text(
-                                            filteredCtries[i],
-                                          ),
-                                        ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        )
-                      : SizedBox(),
 
                   // ElevatedButton(
                   //   style: TextButton.styleFrom(
@@ -229,6 +190,87 @@ class _HeaderState extends State<Header> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class GigaBankTextField extends StatefulWidget {
+  final TextEditingController ctlr;
+  final Function(String) onChanged;
+  final String title;
+  final bool hasSearcableValue;
+  final List<String> searchedValue;
+  final Function(String) onSelected;
+
+  const GigaBankTextField(
+      {super.key,
+      required this.ctlr,
+      required this.onChanged,
+      required this.title,
+      required this.hasSearcableValue,
+      required this.searchedValue,
+      required this.onSelected});
+
+  @override
+  State<GigaBankTextField> createState() => _GigaBankTextFieldState();
+}
+
+class _GigaBankTextFieldState extends State<GigaBankTextField> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextFormField(
+          controller: widget.ctlr,
+          keyboardType: TextInputType.text,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          inputFormatters: [],
+          validator: (v) => v!.fieldvalidation(field: "Country"),
+          onChanged: (value) => {
+            widget.onChanged(value),
+          },
+          decoration: InputDecoration(
+            labelText: "Country",
+            labelStyle: Theme.of(context).textTheme.bodySmall,
+            contentPadding: const EdgeInsets.only(
+              top: 14.0,
+              bottom: 12.0,
+              left: 5.0,
+              right: 14.0,
+            ),
+            filled: true,
+            // fillColor: Colors.white70,
+            suffixIcon: Icon(Icons.search),
+            hintText: "Country",
+            hintStyle: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+        widget.ctlr.text.isNotEmpty
+            ? Container(
+                height: 130,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (var i = 0; i < widget.searchedValue.length; i++) ...[
+                        widget.searchedValue.isEmpty
+                            ? SizedBox()
+                            : ListTile(
+                                visualDensity:
+                                    const VisualDensity(vertical: -3),
+                                onTap: () {
+                                  widget.onSelected(widget.searchedValue[i]);
+                                },
+                                title: Text(
+                                  widget.searchedValue[i],
+                                ),
+                              ),
+                      ],
+                    ],
+                  ),
+                ),
+              )
+            : SizedBox(),
+      ],
     );
   }
 }
